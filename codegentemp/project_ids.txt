@@ -1,0 +1,7 @@
+C:\Users\Georgia\Documents\478-Lab\Workspace01\Final project.cydsn\Final project.cyprj|b097943d-f3d4-4831-ad11-2df283945b41
+C:\Users\Georgia\Documents\ENGR478-Lab\CharLCDmp_Demo\CharLCDmpLib.cylib\CharLCDmpLib.cyprj|5259f84b-3ef8-4509-859b-d22355384d6a
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|0b7ffaad-4ef5-40dd-abc2-5b16573f2f24
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\default\CyReferenceLibrary\CyReferenceLibrary.cylib\CyReferenceLibrary.cyprj|6a1e82a2-93b5-4f30-b5ac-2f40d8f6dc15
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|0ea1449f-6f58-4916-a08b-1ee3676160cc
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|575e1249-d3d8-4586-b1a1-b5fa2bdabfba
+C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|5d4fa846-5554-4be3-8ca5-ee595e1027ce
