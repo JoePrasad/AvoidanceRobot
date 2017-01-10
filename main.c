@@ -9,127 +9,150 @@
  *
  * ========================================
 */
-#include "project.h"
-#include <time.h>
+#include <project.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-void forward();
-void back();
-void left();
-void right();
-void stop();
-//void obstacle(void);
-//uint8 turned =0;
-//uint8 obstacleSide =0;
 
-CY_ISR_PROTO(isr_1);
+#define TRANSMIT_BUFFER_SIZE  16
 
-int turned=0;
+int read_distance();
+int distance = 0;
+int canRead=1;
 
-CY_ISR(GPIO_PSOC1_In_Handler){
-   stop();
-   CyDelay(100);
-   //back();
-   //CyDelay(100);
-   forward();
-   CyDelay(100);
-    LED_pin_Write(0);
-   //left();
-   if(turned==0){
-        left();
-        turned = 1;
-        CyDelay(1000);
-        stop();
-        GPIO_PSOC1_Out_Write(1);
-        CyDelay(100);
-        GPIO_PSOC1_In_ClearInterrupt();
-        //stop();
-    }
-    else if(turned==1){
-        right();//right();//180 degree turn
-        turned=2;
-        CyDelay(1000);
-        stop();
-        GPIO_PSOC1_Out_Write(1);
-        CyDelay(100);
-        GPIO_PSOC1_In_ClearInterrupt();
-        //stop();
-    }
-    else{
-        right();
-        turned=0;
-        CyDelay(1000);
-        stop();
-        GPIO_PSOC1_Out_Write(1);
-        CyDelay(100);
-        GPIO_PSOC1_In_ClearInterrupt();
-        //stop();
-    }
-    CyDelay(500);
-    turned++;
-    GPIO_PSOC1_Out_Write(1);
-    GPIO_PSOC1_In_ClearInterrupt();
+CY_ISR(GPIO_PSOC2_In_Handler){
+    canRead=1;
+    CyDelay(3000);
+//    turn_pin_Write(0);
+    GPIO_PSOC2_In_ClearInterrupt();
 }
 
-int main(void)
-{
-    CyGlobalIntEnable; /* Enable global interrupts. */
-
-    isr_1_StartEx(GPIO_PSOC1_In_Handler);
-    /* Place your initialization/startup code here (e.g. MyInst_Start()) */
-    PWM_1_Enable();
-    PWM_1_Init();
-    PWM_2_Enable();
-    PWM_2_Init();
-    PWM_1_Start();
-    PWM_2_Start();
+int main( void ) {
+	
+    UART_1_Start();
+    CyGlobalIntEnable; 	
+    uint8 counter =0;
+    // Uncomment this line to enable global interrupts.
+    
+    
+    
     
 
-    for(;;)
+    //uint8 p1 = 0;
+    int read_distance();
+    isr_1_StartEx(GPIO_PSOC2_In_Handler);
+    
+    
+    
+    
+    //unsigned int i,j;
+    //for(i=0;i<100;i++);
+    //for(j=0;j<1000;j++)
+    
+    /*for(i=0;i<10;i++);
+    for(j=0;j<100;i++)
     {
-        GPIO_PSOC1_Out_Write(0);
-        LED_pin_Write(1);
-        forward();
-        //CyDelay(1000);
-        
-    }
+        while(1)
+        {
+            p1=0x3f; //for 0
+            CyDelay(100);
+            p1=0x06; //for 1
+            CyDelay(100);
+            p1=0x5b; // for 2
+            CyDelay(100);
+            
+            p1=0x4f; //for 3
+            CyDelay(100);
+            p1=0x66; //for 4
+            CyDelay(100);
+            p1=0x6d; // for 5
+            CyDelay(100);
+            
+            p1=0x7d; //for 6
+            CyDelay(100);
+            p1=0x07; //for 7
+            CyDelay(100);
+            p1=0x7f; // for 8
+            CyDelay(100);
+            
+            p1=0x6F; // for 9
+            CyDelay(100);
+            
+        }
+    }*/
+    LCD_Start();
+    LCD_ClearDisplay();
+    
+   // LCD_Position(16,2);
+    //LCD_PrintString(" Sensor ");
+  //  LCD_Position(1,4);
+    //LCD_PrintString(" HC-Sr04" );
+    //LCD_Position(2,0);
+    //LCD_PrintString("Distance:" );
+    
+    
+	TimeDistMeas_Start( );         				// Start up the distance measuring timer, basically ,measure PW of pulse HC-SRO4 generates
+
+    for(;;) {
+
+        if(canRead==1){
+            distance = read_distance();
+        }
+        if(distance<=5){
+            GPIO_PSOC2_Out_Write(1);
+            canRead=0;
+        }
+        GPIO_PSOC2_Out_Write(0);
+//        turn_pin_Write(1);
+        LCD_Position(0,6);
+        LCD_PrintString("Counter: ");
+        LCD_PrintNumber(counter);
+        counter++;
+        CyDelay(500);
+	}
+  
+
+
+
 }
 
-void forward(){
-    PWM_1_Start();
-    PWM_2_Start();
-    Pin_1_Write(1);
-    Pin_4_Write(1);
-}
-void back(){
-    PWM_1_Start();
-    PWM_2_Start();
-    Pin_2_Write(1);
-    Pin_3_Write(1);
-}
-void stop(){
-    PWM_1_Stop();
-    PWM_2_Stop();
-    Pin_1_Write(0);
-    Pin_2_Write(0);
-    Pin_3_Write(0);
-    Pin_4_Write(0);
-}
-void left(){
-    PWM_1_Start();
-    PWM_2_Start();      
-    Pin_1_Write(0);
-    Pin_4_Write(1);
-    Pin_3_Write(0);
-    Pin_2_Write(1);
-}
-void right(){
-    PWM_1_Start();
-    PWM_2_Start();
-    Pin_1_Write(1);
-    Pin_4_Write(0);
-    Pin_3_Write(1);
-    Pin_2_Write(0);
+int read_distance(){
+    uint16 	TimeDistMeas 	= 0;					// Value read from TimeDistMeas, eg HC-SRO4 PW returned, in 1 uS increments
+    float 	distmeas 		= 0.0;					// Value measured, uS / 148 = inches
+    char TransmitBuffer[TRANSMIT_BUFFER_SIZE];
+    //int value_counter=0;
+    //float distance = 0.0;
+    char imp[9];
+    
+    	
+	while( DistOutHCSRO4_Read( ) == 0 ) { 					// HC-SRO4 ready for a trigger, to start new measurement cycle ?
+		
+		Triggen_Write( 1 ); 								// Trigger the HC-SRO4 to issue the 10 uS start pulse, and reset TimeDistMeas
+		CyDelayUs( 10 );									// Trigger high for 10 uS
+		Triggen_Write( 0 );									// Remove trigger and reset from TimeDistMeas
+		CyDelay( 1 );										// Delay 1 mS to see if HC-SRO4 started a measurement, if not issue another trigger to HC-SRO4
+		
+	}
+	while( DistOutHCSRO4_Read( ) == 1 ) { };				// Wait until HC-SRO4 finishes measurement cycle
+
+	TimeDistMeas = 65535 - TimeDistMeas_ReadCounter( );		// Get timer value, PW in uS, of HC-SRO4
+	distmeas = (float) TimeDistMeas / 148.0;		
+    TimeDistMeas=TimeDistMeas/148;
+	
+	sprintf( imp, "%.2f cm", distmeas );					// Convert distmeas to a string to print on LCD
+    sprintf(TransmitBuffer,"%d\r\n",TimeDistMeas);
+    //sprintf(TransmitBuffer,"%d\r\n",TimeDistMeas_ReadCounter( ));
+    UART_1_PutString(TransmitBuffer);
+	CyDelay( 100 );	
+    // Wait 100 mS before triggering the HC-SRO4 module again
+    //LCD_Position(3,11);
+    //LCD_PrintString(imp);
+    
+    return TimeDistMeas;
 }
 
-
+/*CY_ISR(isr_1_Interrupt){
+    canRead=1;   
+}
+}/*/
 /* [] END OF FILE */
